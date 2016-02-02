@@ -1,6 +1,8 @@
 import pyinotify
 from NgParser import *
+from error.ngForbiddenAccess.ngDenyRule import *
 from pprint import pprint
+
 class MyEventHandler(pyinotify.ProcessEvent):
 
     def process_IN_ACCESS(self, event):
@@ -24,19 +26,13 @@ class MyEventHandler(pyinotify.ProcessEvent):
     def process_IN_MODIFY(self, event):
         print "MODIFY event:", event.pathname
         modify = NgParser(event.pathname)
-        print modify.parseforbiddenAccess()
+        error = modify.parseforbiddenAccess()
+        try:
+            test = NgDenyRule(error['client'], "/etc/nginx/conf.d/max.conf")
+            test.seachDenyRule()
+        except KeyError:
+            print "Key is not exits"
+
 
     def process_IN_OPEN(self, event):
         print "OPEN event:", event.pathname
-
-def main():
-    wm = pyinotify.WatchManager()
-    wm.add_watch("/home/sammman/logs/error.log", pyinotify.ALL_EVENTS, rec=True)
-
-    eh = MyEventHandler()
-
-    notifier = pyinotify.Notifier(wm, eh)
-    notifier.loop()
-
-if __name__ == '__main__':
-    main()

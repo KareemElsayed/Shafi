@@ -30,3 +30,5 @@ class NgParser:
                 forbiddenAccessObj['errorCode'] = tokenErrorLine[indexToken]
                 return forbiddenAccessObj
                 print "--------- token ---------"
+            else:
+                return {}
